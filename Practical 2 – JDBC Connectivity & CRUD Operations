@@ -1,0 +1,139 @@
+package practical_2;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class Practical_2 {
+
+    public static void main(String[] args) {
+
+        try {
+            // 1️⃣ Load JDBC Driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // 2️⃣ Establish Connection
+            Connection con = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3307/jdbc_demo",
+                    "root",
+                    ""
+            );
+
+            // 3️⃣ Create Statement Object
+            Statement stmt = con.createStatement();
+            Scanner sc = new Scanner(System.in);
+
+            int choice;
+
+            // 4️⃣ Menu Driven Program
+            do {
+                System.out.println("\n----- STUDENT MENU -----");
+                System.out.println("1. Insert Student");
+                System.out.println("2. Display Students");
+                System.out.println("3. Update Student");
+                System.out.println("4. Delete Student");
+                System.out.println("5. Exit");
+                System.out.print("Enter your choice: ");
+
+                choice = sc.nextInt();
+                sc.nextLine(); // Clear buffer
+
+                switch (choice) {
+
+                    // ➕ INSERT
+                    case 1:
+                        System.out.print("Enter Student ID: ");
+                        int id = sc.nextInt();
+                        sc.nextLine();
+
+                        System.out.print("Enter Name: ");
+                        String name = sc.nextLine();
+
+                        System.out.print("Enter Course: ");
+                        String course = sc.nextLine();
+
+                        System.out.print("Enter Marks: ");
+                        int marks = sc.nextInt();
+
+                        String insert =
+                            "INSERT INTO student VALUES (" +
+                            id + ",'" + name + "','" + course + "'," + marks + ")";
+
+                        stmt.executeUpdate(insert);
+                        System.out.println("Student record inserted successfully");
+                        break;
+
+                    // 📄 DISPLAY
+                    case 2:
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM student");
+                        System.out.println("\nStudent Records:");
+                        while (rs.next()) {
+                            System.out.println(
+                                rs.getInt("student_id") + " " +
+                                rs.getString("name") + " " +
+                                rs.getString("course") + " " +
+                                rs.getInt("marks")
+                            );
+                        }
+                        break;
+
+                    // ✏️ UPDATE
+                    case 3:
+                        System.out.print("Enter Student ID to update: ");
+                        int uid = sc.nextInt();
+                        sc.nextLine();
+
+                        System.out.print("Enter New Course: ");
+                        String newCourse = sc.nextLine();
+
+                        System.out.print("Enter New Marks: ");
+                        int newMarks = sc.nextInt();
+
+                        String update =
+                            "UPDATE student SET course='" + newCourse +
+                            "', marks=" + newMarks +
+                            " WHERE student_id=" + uid;
+
+                        int rowsUpdated = stmt.executeUpdate(update);
+                        if (rowsUpdated > 0)
+                            System.out.println("Student record updated successfully");
+                        else
+                            System.out.println("Student ID not found");
+                        break;
+
+                    // ❌ DELETE
+                    case 4:
+                        System.out.print("Enter Student ID to delete: ");
+                        int did = sc.nextInt();
+
+                        String delete =
+                            "DELETE FROM student WHERE student_id=" + did;
+
+                        int rowsDeleted = stmt.executeUpdate(delete);
+                        if (rowsDeleted > 0)
+                            System.out.println("Student record deleted successfully");
+                        else
+                            System.out.println("Student ID not found");
+                        break;
+
+                    // 🚪 EXIT
+                    case 5:
+                        System.out.println("Exiting program...");
+                        break;
+
+                    default:
+                        System.out.println("Invalid choice");
+                }
+
+            } while (choice != 5);
+
+            // 5️⃣ Close Connection
+            con.close();
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("JDBC Driver not found");
+
+        } catch (SQLException e) {
+            System.out.println("SQL Error: " + e.getMessage());
+        }
+    }
+}
