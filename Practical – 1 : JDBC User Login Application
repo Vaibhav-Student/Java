@@ -1,0 +1,63 @@
+package practical_1;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class Practical_1_Login {
+
+    public static void main(String[] args) {
+
+        // Step 1: Variables
+        String url = "jdbc:mysql://localhost:3306/college";
+        String dbUser = "root";
+        String dbPassword = "";
+
+        Scanner sc = new Scanner(System.in);
+
+        // Step 2: Take user input
+        System.out.print("Enter Username: ");
+        String username = sc.nextLine();
+
+        System.out.print("Enter Password: ");
+        String password = sc.nextLine();
+
+        try {
+            // Step 3: Load JDBC Driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Step 4: Establish Connection
+            Connection con = DriverManager.getConnection(
+                    url, dbUser, dbPassword
+            );
+
+            // Step 5: SQL Query
+            String sql = "SELECT * FROM users WHERE username=? AND password=?";
+
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, password);
+
+            // Step 6: Execute Query
+            ResultSet rs = ps.executeQuery();
+
+            // Step 7: Check Login
+            if (rs.next()) {
+                System.out.println("✅ Successful Login");
+            } else {
+                System.out.println("❌ Invalid Username or Password");
+            }
+
+            // Step 8: Close Connection
+            con.close();
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("❌ JDBC Driver Not Found");
+
+        } catch (SQLException e) {
+            System.out.println("❌ Database Error");
+            System.out.println(e.getMessage());
+        }
+
+        sc.close();
+    }
+}
